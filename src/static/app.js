@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ${details.participants.map(participant => `
                 <li style="display: flex; align-items: center;">
                   <span>${participant}</span>
-                  <button class="delete-participant" data-activity="${name}" data-participant="${participant}" style="margin-left: 10px; background: none; border: none; color: red; cursor: pointer;">&times;</button>
+                  <button type="button" class="delete-participant" data-activity="${name}" data-participant="${participant}" style="margin-left: 10px; background: none; border: none; color: red; cursor: pointer;">&times;</button>
                 </li>
               `).join('')}
             </ul>
