@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Update the participants section to include a delete icon for each participant
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
@@ -27,8 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
           <div class="participants">
             <p><strong>Participants:</strong></p>
-            <ul>
-              ${details.participants.map(participant => `<li>${participant}</li>`).join('')}
+            <ul style="list-style-type: none; padding-left: 0;">
+              ${details.participants.map(participant => `
+                <li style="display: flex; align-items: center;">
+                  <span>${participant}</span>
+                  <button class="delete-participant" data-activity="${name}" data-participant="${participant}" style="margin-left: 10px; background: none; border: none; color: red; cursor: pointer;">&times;</button>
+                </li>
+              `).join('')}
             </ul>
           </div>
         `;
@@ -84,6 +90,31 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.className = "error";
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
+    }
+  });
+
+  // Add event listener for delete buttons
+  document.addEventListener("click", async (event) => {
+    if (event.target.classList.contains("delete-participant")) {
+      const activity = event.target.getAttribute("data-activity");
+      const participant = event.target.getAttribute("data-participant");
+
+      try {
+        const response = await fetch(`/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(participant)}`, {
+          method: "POST",
+        });
+
+        if (response.ok) {
+          alert(`Successfully removed ${participant} from ${activity}`);
+          fetchActivities(); // Refresh the activities list
+        } else {
+          const result = await response.json();
+          alert(result.detail || "Failed to remove participant.");
+        }
+      } catch (error) {
+        console.error("Error removing participant:", error);
+        alert("An error occurred. Please try again.");
+      }
     }
   });
 
